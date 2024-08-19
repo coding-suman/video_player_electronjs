@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron Video Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="video-container">
+        <video id="video-player" controls></video>
+    </div>
+    
+    <div id="controls">
+        <input type="file" id="file-selector" multiple>
+        <select id="aspect-ratio-selector">
+            <option value="Default">Default</option>
+            <option value="16:9">16:9</option>
+            <option value="4:3">4:3</option>
+            <option value="1:1">1:1</option>
+            <option value="16:10">16:10</option>
+            <option value="2.21:1">2.21:1</option>
+            <option value="2.35:1">2.35:1</option>
+            <option value="2.39:1">2.39:1</option>
+            <option value="5:4">5:4</option>
+        </select>
+        <button id="play-btn">Play</button>
+        <button id="pause-btn">Pause</button>
+        <button id="next-btn">Next</button>
+        <button id="prev-btn">Prev</button>
+        <button id="stop-btn">Stop</button>
+        <button id="fullscreen-btn">Fullscreen</button>
+        <button id="mute-btn">Mute</button>
+        <button id="minimize-btn">Minimize</button>
+        <button id="maximize-btn">Maximize</button>
+        <button id="exit-btn">Exit</button>
+    </div>
+
+    <ul id="video-list"></ul>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
