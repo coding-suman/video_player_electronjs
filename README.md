@@ -24,3 +24,5 @@ An advanced video player application built using Electron, with an attractive an
    ```bash
    git clone https://github.com/coding-suman/video_player_electronjs.git
    cd video_player_electronjs
+
+## SUMAN
