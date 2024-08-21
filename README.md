@@ -26,3 +26,11 @@ An advanced video player application built using Electron, with an attractive an
    cd video_player_electronjs
 
 ## SUMAN
+
+## Build Exe
+npm run package 
+
+#OR
+
+npm install electron-packager --save-dev
+npx electron-packager . --prune=true --overwrite --platform=win32 --arch=x64 --out=out --icon=./assets/icons/app-icon.ico

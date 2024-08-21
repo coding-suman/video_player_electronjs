@@ -2,17 +2,54 @@
   "name": "video-player",
   "version": "1.0.0",
   "main": "main.js",
+  "description": "A simple video player application built with Electron by SUMAN MANDAL.",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "electron-builder --win"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "electron": "^31.4.0"
+    "electron": "^31.4.0",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2"
   },
   "dependencies": {
-    "@mui/icons-material": "^5.16.7"
+    "@mui/icons-material": "^5.16.7",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "ws": "^8.18.0"
+  },
+  "build": {
+    "appId": "com.videoplayer.app",
+    "productName": "Video Player",
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "media/**/*",
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "extraResources": {
+      "from": "assets/",
+      "to": "assets/"
+    },
+    "mac": {
+      "icon": "assets/icons/app-icon.icns"
+    },
+    "win": {
+      "icon": "assets/icons/app-icon.ico",
+      "target": "nsis"
+    },
+    "linux": {
+      "icon": "assets/icons/app-icon.png"
+    }
   }
 }

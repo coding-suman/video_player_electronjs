@@ -4,11 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electron Video Player</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #controls {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        /* #video-player {
+            width: 100%;
+            max-width: 800px;
+            background-color: #000;
+        } */
+        #video-list {
+            width: 100%;
+            max-width: 800px;
+            background-color: #333;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #video-list li {
+            padding: 10px;
+            border-bottom: 1px solid #555;
+            cursor: pointer;
+        }
+        #video-list li:hover {
+            background-color: #444;
+        }
+        #ip-address-display {
+            position: absolute;
+            top: 10px;
+            text-align: center;
+            width: 100%;
+            font-size: 18px;
+            display: none; /* Initially hidden, will be shown later */
+        }
+    </style>
 </head>
 <body>
+    <div id="ip-address-display"></div>
     <div id="video-container">
-        <video id="video-player" controls></video>
+        <video id="video-player"></video>
     </div>
     
     <div id="controls">

@@ -3,16 +3,29 @@ const videoPlayer = document.getElementById('video-player');
 const fileSelector = document.getElementById('file-selector');
 const videoList = document.getElementById('video-list');
 const controls = document.getElementById('controls');
-const aspectRatioSelector = document.getElementById('aspect-ratio-selector'); // New element for aspect ratio
+const aspectRatioSelector = document.getElementById('aspect-ratio-selector'); 
+const ipAddressDisplay = document.getElementById('ip-address-display');
 
 let videoFiles = [];
 let currentVideoIndex = 0;
 let isMuted = false;
 let isFullscreen = false;
-let isStopped = false; // New flag to track if the video was stopped
+let isStopped = false;
 
 // Aspect ratio options
-const aspectRatios = {
+const aspectRatios = [
+    "Default",
+    "16:9",
+    "4:3",
+    "1:1",
+    "16:10",
+    "2.21:1",
+    "2.35:1",
+    "2.39:1",
+    "5:4"
+];
+
+const aspectRatioValues = {
     "Default": null,
     "16:9": 16 / 9,
     "4:3": 4 / 3,
@@ -23,6 +36,8 @@ const aspectRatios = {
     "2.39:1": 2.39 / 1,
     "5:4": 5 / 4
 };
+
+let currentAspectRatioIndex = 0;
 
 // Event listeners for control buttons
 document.getElementById('play-btn').addEventListener('click', playVideo);
@@ -53,6 +68,21 @@ fileSelector.addEventListener('change', (event) => {
     }
 });
 
+// Handle files received via HTTP (from Android)
+window.electronAPI.onFileReceived((event, file) => {
+    addFileToPlaylist(file.filePath, file.fileName);
+});
+
+// Add received file to playlist
+function addFileToPlaylist(filePath, fileName) {
+    const formattedPath = `file://${filePath}`;  // Format the file path to be a valid file URI
+    videoFiles.push({ name: fileName, path: formattedPath });
+    updateVideoList();
+
+    // Automatically play the newly added file
+    loadVideo(videoFiles.length - 1);
+}
+
 // Update video list UI
 function updateVideoList() {
     videoList.innerHTML = '';
@@ -70,7 +100,7 @@ function updateVideoList() {
 // Load and play a video by index
 function loadVideo(index) {
     if (videoFiles.length > 0) {
-        videoPlayer.src = URL.createObjectURL(videoFiles[index]);
+        videoPlayer.src = videoFiles[index].path;
         videoPlayer.play();
         hideVideoList();  // Hide the list when the video starts playing
         isStopped = false; // Reset the stopped flag
@@ -128,11 +158,13 @@ function toggleMuteUnmute() {
 // Hide video list when a video is playing
 function hideVideoList() {
     videoList.style.display = 'none';
+    ipAddressDisplay.style.display = 'none';
 }
 
 // Show video list when no video is playing
 function showVideoList() {
     videoList.style.display = 'block';
+    ipAddressDisplay.style.display = 'block';
 }
 
 // Toggle fullscreen and hide/show controls
@@ -147,11 +179,23 @@ aspectRatioSelector.addEventListener('change', () => {
     setAspectRatio(aspectRatioSelector.value);
 });
 
+// Cycle through aspect ratios when "a" is pressed
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'a' || event.key === 'A') {
+        currentAspectRatioIndex = (currentAspectRatioIndex + 1) % aspectRatios.length;
+        const selectedAspectRatio = aspectRatios[currentAspectRatioIndex];
+        aspectRatioSelector.value = selectedAspectRatio; // Update dropdown to reflect change
+        setAspectRatio(selectedAspectRatio);
+    }
+});
+
 function setAspectRatio(ratioKey) {
-    const aspectRatio = aspectRatios[ratioKey];
+    const aspectRatio = aspectRatioValues[ratioKey];
     if (aspectRatio) {
-        videoPlayer.style.width = `calc(${aspectRatio} * 100vh)`;  // Set width based on aspect ratio
-        videoPlayer.style.height = '100vh';  // Full height
+        const height = videoPlayer.clientHeight;
+        const newWidth = Math.round(height * aspectRatio);
+        videoPlayer.style.width = `${newWidth}px`;
+        videoPlayer.style.height = `${height}px`;
     } else {
         videoPlayer.style.width = '';  // Reset to default width
         videoPlayer.style.height = '';  // Reset to default height
@@ -184,5 +228,86 @@ document.addEventListener('keydown', (event) => {
                 toggleFullscreen();
             }
             break;
+    }
+});
+
+// Listen for the IPv4 address from the main process
+window.electronAPI.onIPv4Address((event, ipv4Address) => {
+    ipAddressDisplay.textContent = `IP Address: ${ipv4Address}`;
+    ipAddressDisplay.style.display = 'block'; // Ensure it's visible
+});
+
+// Handle control commands received from the Android app
+// window.electronAPI.onControlCommand('control-command', (event, command) => {
+//     switch (command) {
+//         case 'play':
+//             playVideo();
+//             break;
+//         case 'pause_resume':
+//             pauseResumeVideo();
+//             break;
+//         case 'next':
+//             nextVideo();
+//             break;
+//         case 'previous':
+//             prevVideo();
+//             break;
+//         case 'stop':
+//             stopVideo();
+//             break;
+//         case 'fullscreen':
+//             toggleFullscreen();
+//             break;
+//         case 'mute_unmute':
+//             toggleMuteUnmute();
+//             break;
+//         case 'exit':
+//             window.electronAPI.closeWindow();
+//             break;
+//         case 'aspect_ratio':
+//             currentAspectRatioIndex = (currentAspectRatioIndex + 1) % aspectRatios.length;
+//             const selectedAspectRatio = aspectRatios[currentAspectRatioIndex];
+//             aspectRatioSelector.value = selectedAspectRatio;
+//             setAspectRatio(selectedAspectRatio);
+//             break;
+//         default:
+//             console.log(`Unknown command: ${command}`);
+//     }
+// });
+
+window.electronAPI.onControlCommand((command) => {
+    switch (command) {
+        case 'play':
+            playVideo();
+            break;
+        case 'pause_resume':
+            pauseResumeVideo();
+            break;
+        case 'next':
+            nextVideo();
+            break;
+        case 'previous':
+            prevVideo();
+            break;
+        case 'stop':
+            stopVideo();
+            break;
+        case 'fullscreen':
+            toggleFullscreen();
+            break;
+        case 'mute_unmute':
+            toggleMuteUnmute();
+            break;
+        case 'exit':
+            window.electronAPI.closeWindow();
+            break;
+        case 'aspect_ratio':
+            currentAspectRatioIndex = (currentAspectRatioIndex + 1) % aspectRatios.length;
+            const selectedAspectRatio = aspectRatios[currentAspectRatioIndex];
+            aspectRatioSelector.value = selectedAspectRatio;
+            setAspectRatio(selectedAspectRatio);
+            break;
+        default:
+            console.log(`Unknown command: ${command}`);
     }
 });
